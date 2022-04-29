@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     # Creating shapes on GPU memory
     # Flappy Bird Shape
-    shapeBird = bs.createTextureQuad(1, 1.5)
+    shapeBird = bs.createTextureQuad(1, 1)
     gpuBird = GPUShape().initBuffers()
     pipeline.setupVAO(gpuBird)
     gpuBird.fillBuffers(shapeBird.vertices, shapeBird.indices, GL_STATIC_DRAW)
