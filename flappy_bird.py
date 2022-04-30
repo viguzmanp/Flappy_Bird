@@ -1,117 +1,84 @@
 # coding=utf-8
+__author__ = "Vicente Guzmán Pinto"
+__license__ = "MIT"
+
+## Imports
 import glfw
 from OpenGL.GL import *
 import numpy as np
 import sys, os.path
+from model import *
+from controller import Controller
 
-#Local 'grafica' imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from grafica.gpu_shape import GPUShape
-import grafica.transformations as tr
-import grafica.basic_shapes as bs
-import grafica.easy_shaders as es
-from grafica.assets_path import getAssetPath
+if __name__ == '__main__':
 
-__author__ = "Vicente Guzmán Pinto"
-__license__ = "MIT"
-
-
-### Controller and Buttons Area ###
-# A class to store the application control
-class Controller:
-    def __init__(self):
-        self.fillPolygon = True
-        self.useGravity = True
-
-# global controller as communication with the callback function
-controller = Controller()
-
-# List of all keyboard calls
-def on_key(window, key, scancode, action, mods):
-    if action != glfw.PRESS:
-        return
-
-    global controller
-
-    if key == glfw.KEY_SPACE:
-        controller.fillPolygon = not controller.fillPolygon
-
-    elif key == glfw.KEY_ESCAPE:
-        glfw.set_window_should_close(window, True)
-
-    elif key == glfw.KEY_UP:
-        pass
-
-
-### Execution Area ###
-if __name__ == "__main__":
-
-    ### Config Area ###
     # Initialize glfw
     if not glfw.init():
-        glfw.set_window_should_close(window, True)
+        sys.exit()
 
-    # Size of app window
-    width = 720
-    height = 720
-
-    window = glfw.create_window(width, height, "Flappy Bird", None, None)
-    
+    # Window Settings
+    width = 600
+    height = 600
+    window = glfw.create_window(width, height, 'Flappy Bird', None, None)
     if not window:
         glfw.terminate()
-        glfw.set_window_should_close(window, True)
-
+        sys.exit()
     glfw.make_context_current(window)
 
-    # Connecting the callback function 'on_key' to handle keyboard events
-    glfw.set_key_callback(window, on_key)
+    # Defines the controller
+    controller = Controller()
 
-    # A simple shader program with position and texture coordinates as inputs.
-    pipeline = es.SimpleTextureTransformShaderProgram()
+    # Connecting the callback function 'on_key' to handle keyboard events
+    glfw.set_key_callback(window, controller.on_key)
+
+    # Assembling the shader program (pipeline) with both shaders
+    pipeline = es.SimpleTransformShaderProgram()
 
     # Telling OpenGL to use our shader program
     glUseProgram(pipeline.shaderProgram)
 
-    # Setting up the clear screen color
-    glClearColor(0.25, 0.25, 0.25, 1.0)
+    # Setting up the clear background color
+    glClearColor(0.85, 0.85, 0.85, 1.0)
 
-    # Enabling transparencies
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    # Our shapes here are always fully painted
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
-    ### Shapes Area ###
+    # Make the objects
+    bird = Bird(pipeline)
+    tubes = TubeFactory()
+    controller.set_model(bird)
+    controller.set_tubes(tubes)
 
-    # Creating shapes on GPU memory
-    # Flappy Bird Shape
-    shapeBird = bs.createTextureQuad(1, 1)
-    gpuBird = GPUShape().initBuffers()
-    pipeline.setupVAO(gpuBird)
-    gpuBird.fillBuffers(shapeBird.vertices, shapeBird.indices, GL_STATIC_DRAW)
-    gpuBird.texture = es.textureSimpleSetup(
-        getAssetPath("sprites\\yellowbird-upflap.png"), GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_NEAREST, GL_NEAREST)
+    # Sets the initial time value
+    t0 = 0
 
-    while not glfw.window_should_close(window):
+    # Sets gravity value
+    gravity = np.array([0, -15, 0], dtype = np.float32)
+
+    while not glfw.window_should_close(window):  # Dibujando --> 1. obtener el input
+
+        # Calculamos el dt
+        ti = glfw.get_time()
+        dt = ti - t0
+        t0 = ti
+
         # Using GLFW to check for input events
-        glfw.poll_events()
-
-        if (controller.fillPolygon):
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-        else:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glfw.poll_events()  # OBTIENE EL INPUT --> CONTROLADOR --> MODELOS
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
+        tubes.create_tube(pipeline)  # Aleatorio
+        tubes.updatePosition(0.5 * dt)  # 0.001
+        bird.updatePosition(gravity, dt)
 
-        ## Drawing the shapes
-        #Bird shape
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "transform"), 1, GL_TRUE, tr.matmul([
-            tr.scale(1.0, 1.0, 1.0)]))
-        pipeline.drawCall(gpuBird)
+        # Reconocer la logica
+        bird.collide(tubes)  # ---> RECORRER TODOS LOS TUBOS
+
+        # DIBUJAR LOS MODELOS
+        bird.draw(pipeline)
+        tubes.draw(pipeline)
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
-
-    # freeing GPU memory
-    gpuBird.clear()
 
     glfw.terminate()

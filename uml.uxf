@@ -1,0 +1,38 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text>&lt;diagram program="umletino" version="14.4.0-SNAPSHOT"&gt;&lt;zoom_level&gt;10&lt;/zoom_level&gt;&lt;element&gt;&lt;id&gt;Relation&lt;/id&gt;&lt;coordinates&gt;&lt;x&gt;600&lt;/x&gt;&lt;y&gt;430&lt;/y&gt;&lt;w&gt;200&lt;/w&gt;&lt;h&gt;70&lt;/h&gt;&lt;/coordinates&gt;&lt;panel_attributes&gt;lt=&amp;lt;&amp;lt;-&lt;/panel_attributes&gt;&lt;additional_attributes&gt;180;50;180;10;10;10&lt;/additional_attributes&gt;&lt;/element&gt;&lt;/diagram&gt;&lt;diagram program="umletino" version="14.4.0-SNAPSHOT"&gt;&lt;zoom_level&gt;10&lt;/zoom_level&gt;&lt;element&gt;&lt;id&gt;UMLClass&lt;/id&gt;&lt;coordinates&gt;&lt;x&gt;200&lt;/x&gt;&lt;y&gt;450&lt;/y&gt;&lt;w&gt;140&lt;/w&gt;&lt;h&gt;70&lt;/h&gt;&lt;/coordinates&gt;&lt;panel_attributes&gt;_Tube_
+--
+draw()
+updatePosition()&lt;/panel_attributes&gt;&lt;additional_attributes&gt;&lt;/additional_attributes&gt;&lt;/element&gt;&lt;/diagram&gt;&lt;diagram program="umletino" version="14.4.0-SNAPSHOT"&gt;&lt;zoom_level&gt;10&lt;/zoom_level&gt;&lt;element&gt;&lt;id&gt;UMLClass&lt;/id&gt;&lt;coordinates&gt;&lt;x&gt;39&lt;/x&gt;&lt;y&gt;450&lt;/y&gt;&lt;w&gt;140&lt;/w&gt;&lt;h&gt;110&lt;/h&gt;&lt;/coordinates&gt;&lt;panel_attributes&gt;_Bird_
+--
+draw()
+modifymodel()
+updatePosition()
+up()
+collide()&lt;/panel_attributes&gt;&lt;additional_attributes&gt;&lt;/additional_attributes&gt;&lt;/element&gt;&lt;/diagram&gt;&lt;diagram program="umletino" version="14.4.0-SNAPSHOT"&gt;&lt;zoom_level&gt;10&lt;/zoom_level&gt;&lt;element&gt;&lt;id&gt;UMLClass&lt;/id&gt;&lt;coordinates&gt;&lt;x&gt;620&lt;/x&gt;&lt;y&gt;260&lt;/y&gt;&lt;w&gt;100&lt;/w&gt;&lt;h&gt;30&lt;/h&gt;&lt;/coordinates&gt;&lt;panel_attributes&gt;Controller&lt;/panel_attributes&gt;&lt;additional_attributes&gt;&lt;/additional_attributes&gt;&lt;/element&gt;&lt;/diagram&gt;Space for diagram notes</help_text><element><id>UMLActor</id><coordinates><x>551</x><y>230</y><w>60</w><h>110</h></coordinates><panel_attributes>user</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>651</x><y>320</y><w>100</w><h>30</h></coordinates><panel_attributes>Controller</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>531</x><y>390</y><w>100</w><h>30</h></coordinates><panel_attributes>Model</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>401</x><y>320</y><w>100</w><h>30</h></coordinates><panel_attributes>View</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>590</x><y>260</y><w>140</w><h>80</h></coordinates><panel_attributes>lt=&lt;-
+Usa</panel_attributes><additional_attributes>120;60;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>620</x><y>340</y><w>100</w><h>90</h></coordinates><panel_attributes>lt=&lt;-
+Manipula</panel_attributes><additional_attributes>10;70;80;10</additional_attributes></element><element><id>Relation</id><coordinates><x>440</x><y>340</y><w>110</w><h>80</h></coordinates><panel_attributes>lt=&lt;-
+m2=Actualiza</panel_attributes><additional_attributes>10;10;90;60</additional_attributes></element><element><id>Relation</id><coordinates><x>440</x><y>260</y><w>140</w><h>80</h></coordinates><panel_attributes>lt=&lt;-
+Ve</panel_attributes><additional_attributes>120;10;10;60</additional_attributes></element><element><id>UMLClass</id><coordinates><x>350</x><y>490</y><w>140</w><h>120</h></coordinates><panel_attributes>_Bird_
+--
+draw()
+modifymodel()
+updatePosition()
+up()
+collide()
+counter()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>511</x><y>490</y><w>140</w><h>70</h></coordinates><panel_attributes>_Tube_
+--
+draw()
+updatePosition()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>671</x><y>490</y><w>140</w><h>120</h></coordinates><panel_attributes>_TubeFactory_
+--
+die()
+win()
+create_tube()
+draw()
+updatePosition()
+delete()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>570</x><y>410</y><w>30</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>570</x><y>440</y><w>200</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>180;50;180;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>410</x><y>440</y><w>190</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10;170;10</additional_attributes></element><element><id>Relation</id><coordinates><x>740</x><y>330</y><w>100</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>80;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>820</x><y>320</y><w>100</w><h>40</h></coordinates><panel_attributes>Keyboard
+Calls</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>790</x><y>410</y><w>160</w><h>40</h></coordinates><panel_attributes>UpArrow/Space: Bird flies
+Esc: Close game</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>860</x><y>350</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>230</x><y>360</y><w>120</w><h>90</h></coordinates><panel_attributes>Program
+Window
+--
+Size
+Name
+Colors and objects</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>340</x><y>330</y><w>80</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;40;80;40;10;60;10</additional_attributes></element></diagram>

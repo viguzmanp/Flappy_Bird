@@ -16,8 +16,10 @@
 ## 1. Solución Propuesta
 
 ### 1.1. Arquitectura de la Solución
+Se implementaron las librerías numpy 1.22.3, PyOpenGL 3.1.6 y GLFW 3.3.7
 
 ### 1.2. Diagrama de Soporte
+![diagram](diagram.png)
 
 ## 2. Instrucciones de Ejecución
 
@@ -39,5 +41,4 @@ El juego solo recibe una tecla para jugar, pues es un clicker.
 
 ## 3. Resultados
 
-Se adjuntan imágenes para mostrar el resultado del juego:ç
-
+Se adjuntan imágenes para mostrar el resultado del juego:
