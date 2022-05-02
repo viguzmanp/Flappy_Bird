@@ -46,6 +46,12 @@ class PerformanceMonitor:
         """
         return self.deltaTime
 
+    def getTimer(self):
+        """
+        Get the timer.
+        """
+        return self.timer
+
     def getFPS(self):
         """
         Returns the latest fps measure

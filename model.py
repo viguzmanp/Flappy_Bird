@@ -6,6 +6,7 @@ __license__ = "MIT"
 # Libraries imports
 from OpenGL.GL import *
 import random
+import glfw
 from typing import List
 import sys, os.path
 import numpy as np
@@ -16,10 +17,13 @@ import grafica.transformations as tr
 import grafica.basic_shapes as bs
 import grafica.scene_graph as sg
 import grafica.easy_shaders as es
+import grafica.performance_monitor as pm
 from grafica.assets_path import getAssetPath
 
 # Sets the value to win
 N = sys.argv[1] 
+
+perfMon = pm.PerformanceMonitor(glfw.get_time(),1.5)
 
 # Settings to create shapes
 def create_gpu(shape, pipeline):
@@ -28,9 +32,6 @@ def create_gpu(shape, pipeline):
     gpu.fillBuffers(shape.vertices, shape.indices, GL_STATIC_DRAW)
     return gpu
 
-# Defines gravity
-gravity = np.array([0, -15, 0], dtype = np.float32)
-
 # Class that represents a Flappy Bird
 class Bird(object):
 
@@ -38,26 +39,26 @@ class Bird(object):
    def __init__(self, pipeline):
 
       # Creates the bird shape
-      gpu_bird = create_gpu(bs.createTextureQuad(1,1), pipeline)
-      gpu_bird.texture = es.textureSimpleSetup(
-        getAssetPath("sprites\\yellowbird-upflap.png"), 
-        GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_NEAREST, GL_NEAREST)
+      gpu_bird = create_gpu(bs.createColorQuad(1,1,0), pipeline)
+      #gpu_bird.texture = es.textureSimpleSetup(
+      #  getAssetPath("sprites\\yellowbird-upflap.png"), 
+      #  GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_NEAREST, GL_NEAREST)
       bird = sg.SceneGraphNode('bird')
-      bird.transform = tr.uniformScale(1)
+      bird.transform = tr.matmul([tr.uniformScale(0.2), tr.translate(-2.5, 0, 0)]) 
       bird.childs += [gpu_bird]
 
       self.model = bird
       self.y = 0  # Indicates visual position of bird
       self.alive = True # Indicates if the bird is alive or not
-      self.velocity = 3
+      self.velocity = np.array([0, 0, 0], dtype=np.float32)
 
    # Draws the shape into the scene
    def draw(self, pipeline):
      sg.drawSceneGraphNode(self.model, pipeline, 'transform')
 
    # Transforms the model geometry according to interns variables 
-   def modifymodel(self):
-      self.model.transform = tr.translate(self.y, 0, 0)
+   #def modifymodel(self):
+      #self.model.transform = tr.translate(0, self.y, 0)
 
    # Updates the position of the bird
    def updatePosition(self, gravity, dt):
@@ -69,7 +70,7 @@ class Bird(object):
    def up(self):
       if not self.alive:
          return
-      self.velocity -= 2
+      self.velocity = -self.velocity * 0.7
 
    #Shows if it collides with a tube
    def collide(self, tubes: 'TubeFactory'):
@@ -79,10 +80,10 @@ class Bird(object):
       #Erase tubes that was surpassed and kill bird if it collides
       deleted_tubes = []
       for e in tubes.tubes:
-         if e.pos_x < -0.8:
+         if e.pos_x < -1.3:
             self.counter(tubes)
             deleted_tubes.append(e)
-         elif -0.25 >= e.pos_x >= -0.8 and self.y == e.pos_y:
+         elif -0.18 >= e.pos_x >= -0.6:
             tubes.die()
             self.alive = False
       tubes.delete(deleted_tubes)
@@ -91,7 +92,7 @@ class Bird(object):
    def counter(self, tubes: 'TubeFactory'):
       count = 0
       count += 1
-      if count >= N:
+      if count >= int(N):
          tubes.win
 
 
@@ -102,22 +103,30 @@ class Tube(object):
    def __init__(self, pipeline):
 
       # Creates the tube shape
-      gpu_tube = create_gpu(bs.createTextureQuad(1,1), pipeline)
+      gpu_tube = create_gpu(bs.createColorQuad(0,1,0), pipeline)
 
       tube = sg.SceneGraphNode('tube')
-      tube.transform = tr.scale(0.1, 0.2, 1)
+      tube.transform = tr.scale(0.3, 1.5, 1)
       tube.childs += [gpu_tube]
 
+      tube_sup = sg.SceneGraphNode('tubeSup')
+      tube_sup.transform = tr.translate(0.3, 1.1, 0)
+      tube_sup.childs = [tube]
+
+      tube_inf = sg.SceneGraphNode('tubeInf')
+      tube_inf.transform = tr.translate(0.3, -1.1, 0)
+      tube_inf.childs = [tube]
+
       tube_tr = sg.SceneGraphNode('tubeTR')
-      tube_tr.childs += [tube]
+      tube_tr.childs += [tube_sup, tube_inf]
 
       self.pos_x = 1
-      self.pos_y = (random.randrange(-8, 8, 1))/10
+      self.pos_y = (random.randrange(-3 , 7, 1))/10
       self.model = tube_tr
 
    # Draws the shape into the scene
    def draw(self, pipeline):
-      #self.model.transform = tr.translate(0.7 * self.pos_x, self.pos_y, 0)
+      self.model.transform = tr.translate(self.pos_x, self.pos_y, 0)
       sg.drawSceneGraphNode(self.model, pipeline, "transform")
 
    # Updates the position of a tube
@@ -126,7 +135,7 @@ class Tube(object):
 
 # Class that represents a factory who makes tubes
 class TubeFactory(object):
-   tubes: List['tubes']
+   tubes: List['Tube']
 
    #Initializes on the program
    def __init__(self):
@@ -136,19 +145,22 @@ class TubeFactory(object):
    # Sets the scene when the player dies
    def die(self):
       glClearColor(1, 0, 0, 1.0)  # Cambiamos a rojo
-      self.on = False  # Dejamos de generar tuberías, si es True es porque el jugador ya perdió
+      #self.on = False  # Dejamos de generar tuberías, si es True es porque el jugador ya perdió
 
    # Sets the scene when the player wins
    def win(self):
       glClearColor(0, 1, 0, 1.0)  # Cambiamos a verde
-      self.on = False  # Dejamos de generar tuberías, si es True es porque el jugador ya perdió
 
    # Factory that creates tubes in the scene
    def create_tube(self, pipeline):
+      perfMon.update(glfw.get_time())
+      print(perfMon.getTimer())
       if len(self.tubes) >= 10 or not self.on:  # No puede haber más de 10 tuberías en pantalla
          return
-      if random.random() < 0.01:
+      if perfMon.getTimer() > (1.5 - perfMon.getDeltaTime()): #Creates a tube every period selected in line 26
          self.tubes.append(Tube(pipeline))
+      #if random.random() < 0.0001:
+         #self.tubes.append(Tube(pipeline))
 
    # Draws the shape into the scene
    def draw(self, pipeline):

@@ -38,7 +38,7 @@ if __name__ == '__main__':
     glUseProgram(pipeline.shaderProgram)
 
     # Setting up the clear background color
-    glClearColor(0.85, 0.85, 0.85, 1.0)
+    glClearColor(0, 0.7, 0.7, 1.0)
 
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # Sets the initial time value
     t0 = 0
 
-    # Sets gravity value
+    # Defines gravity
     gravity = np.array([0, -15, 0], dtype = np.float32)
 
     while not glfw.window_should_close(window):  # Dibujando --> 1. obtener el input
@@ -67,16 +67,16 @@ if __name__ == '__main__':
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
-        tubes.create_tube(pipeline)  # Aleatorio
-        tubes.updatePosition(0.5 * dt)  # 0.001
+        tubes.create_tube(pipeline)
+        tubes.updatePosition(dt)
         bird.updatePosition(gravity, dt)
 
         # Reconocer la logica
         bird.collide(tubes)  # ---> RECORRER TODOS LOS TUBOS
 
         # DIBUJAR LOS MODELOS
-        bird.draw(pipeline)
         tubes.draw(pipeline)
+        bird.draw(pipeline)
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)

@@ -28,16 +28,17 @@ class Controller(object):
    
    # Interprets the inputs and modifies the model
    def on_key(self, window, key, scancode, action, mods):
-      if not (action == glfw.PRESS or action == glfw.RELEASE):
+      if action != glfw.PRESS:
          return
 
       # Esc: close game
       if key == glfw.KEY_ESCAPE:
-         sys.exit()
+         glfw.set_window_should_close(window, True)
 
       # UpArrow/SpaceBar: Bird flies
       elif key == glfw.KEY_UP or key == glfw.KEY_SPACE:
          self.model.up()
+         print('Flap')
 
       # Any other button
       else:
