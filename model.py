@@ -4,6 +4,7 @@ __license__ = "MIT"
 
 ## Imports
 # Libraries imports
+from msilib.schema import Class
 from OpenGL.GL import *
 import random
 import glfw
@@ -23,6 +24,7 @@ from grafica.assets_path import getAssetPath
 # Sets the value to win
 N = sys.argv[1] 
 
+# Tool that counts time passed and its fps
 perfMon = pm.PerformanceMonitor(glfw.get_time(),1.5)
 
 # Settings to create shapes
@@ -40,9 +42,6 @@ class Bird(object):
 
       # Creates the bird shape
       gpu_bird = create_gpu(bs.createColorQuad(1,1,0), pipeline)
-      #gpu_bird.texture = es.textureSimpleSetup(
-      #  getAssetPath("sprites\\yellowbird-upflap.png"), 
-      #  GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_NEAREST, GL_NEAREST)
       bird = sg.SceneGraphNode('bird')
       bird.transform = tr.matmul([tr.uniformScale(0.2), tr.translate(-2.5, 0, 0)]) 
       bird.childs += [gpu_bird]
@@ -57,23 +56,24 @@ class Bird(object):
      sg.drawSceneGraphNode(self.model, pipeline, 'transform')
 
    # Transforms the model geometry according to interns variables 
-   #def modifymodel(self):
-      #self.model.transform = tr.translate(0, self.y, 0)
+   def modifymodel(self):
+      self.model.transform = tr.matmul([tr.uniformScale(0.2), tr.translate(-2.5, self.y, 0)])
 
    # Updates the position of the bird
    def updatePosition(self, gravity, dt):
       self.velocity += dt * gravity
-      self.y += self.velocity * dt 
-      #self.modifymodel()
+      self.y += self.velocity[1] 
+      self.modifymodel()
 
    # Lets bird moves up
    def up(self):
       if not self.alive:
          return
-      self.velocity = -self.velocity * 0.7
+      self.velocity = 0.0029
 
    #Shows if it collides with a tube
    def collide(self, tubes: 'TubeFactory'):
+      range = 0.075 # rango que hay entre el centro de la separación de las tuberías y las tuberías
       if not tubes.on:  # Si el jugador perdió, no detecta colisiones
          return
 
@@ -83,18 +83,16 @@ class Bird(object):
          if e.pos_x < -1.3:
             self.counter(tubes)
             deleted_tubes.append(e)
-         elif -0.18 >= e.pos_x >= -0.6:
+         elif -1 <= e.pos_x <= -0.57 and not(self.y/10 - range <= e.pos_y/2 <= self.y/10 + range):
             tubes.die()
             self.alive = False
       tubes.delete(deleted_tubes)
 
    # Counts the amount of tubes that the player surpasses
    def counter(self, tubes: 'TubeFactory'):
-      count = 0
-      count += 1
-      if count >= int(N):
-         tubes.win
-
+      tubes.count += 1
+      if tubes.count >= int(N):
+         tubes.win()
 
 # Class that represents a tube
 class Tube(object):
@@ -105,23 +103,27 @@ class Tube(object):
       # Creates the tube shape
       gpu_tube = create_gpu(bs.createColorQuad(0,1,0), pipeline)
 
+      # Tube model
       tube = sg.SceneGraphNode('tube')
       tube.transform = tr.scale(0.3, 1.5, 1)
       tube.childs += [gpu_tube]
 
+      # Superior tube
       tube_sup = sg.SceneGraphNode('tubeSup')
-      tube_sup.transform = tr.translate(0.3, 1.1, 0)
+      tube_sup.transform = tr.translate(0.3, 1.0, 0)
       tube_sup.childs = [tube]
 
+      # Inferior tube
       tube_inf = sg.SceneGraphNode('tubeInf')
-      tube_inf.transform = tr.translate(0.3, -1.1, 0)
+      tube_inf.transform = tr.translate(0.3, -1.0, 0)
       tube_inf.childs = [tube]
 
+      # Tubes column
       tube_tr = sg.SceneGraphNode('tubeTR')
       tube_tr.childs += [tube_sup, tube_inf]
 
       self.pos_x = 1
-      self.pos_y = (random.randrange(-3 , 7, 1))/10
+      self.pos_y = (random.randrange(-55 , 55, 1))/100
       self.model = tube_tr
 
    # Draws the shape into the scene
@@ -136,6 +138,7 @@ class Tube(object):
 # Class that represents a factory who makes tubes
 class TubeFactory(object):
    tubes: List['Tube']
+   count = 0
 
    #Initializes on the program
    def __init__(self):
@@ -145,22 +148,20 @@ class TubeFactory(object):
    # Sets the scene when the player dies
    def die(self):
       glClearColor(1, 0, 0, 1.0)  # Cambiamos a rojo
-      #self.on = False  # Dejamos de generar tuberías, si es True es porque el jugador ya perdió
+      self.on = False  # Dejamos de generar tuberías, si es True es porque el jugador ya perdió
 
    # Sets the scene when the player wins
    def win(self):
-      glClearColor(0, 1, 0, 1.0)  # Cambiamos a verde
+      glClearColor(0, 0.4, 0, 1.0)  # Cambiamos a verde
 
    # Factory that creates tubes in the scene
    def create_tube(self, pipeline):
       perfMon.update(glfw.get_time())
-      print(perfMon.getTimer())
+
       if len(self.tubes) >= 10 or not self.on:  # No puede haber más de 10 tuberías en pantalla
          return
-      if perfMon.getTimer() > (1.5 - perfMon.getDeltaTime()): #Creates a tube every period selected in line 26
+      if (perfMon.period + perfMon.getDeltaTime()) > perfMon.getTimer() > (perfMon.period - perfMon.getDeltaTime()): #Creates a tube every period selected in line 26
          self.tubes.append(Tube(pipeline))
-      #if random.random() < 0.0001:
-         #self.tubes.append(Tube(pipeline))
 
    # Draws the shape into the scene
    def draw(self, pipeline):

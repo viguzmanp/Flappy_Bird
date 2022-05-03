@@ -38,7 +38,6 @@ class Controller(object):
       # UpArrow/SpaceBar: Bird flies
       elif key == glfw.KEY_UP or key == glfw.KEY_SPACE:
          self.model.up()
-         print('Flap')
 
       # Any other button
       else:

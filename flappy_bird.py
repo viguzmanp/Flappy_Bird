@@ -3,6 +3,7 @@ __author__ = "Vicente Guzmán Pinto"
 __license__ = "MIT"
 
 ## Imports
+from turtle import back
 import glfw
 from OpenGL.GL import *
 import numpy as np
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     t0 = 0
 
     # Defines gravity
-    gravity = np.array([0, -15, 0], dtype = np.float32)
+    gravity = np.array([0, -0.008, 0], dtype = np.float32)
 
     while not glfw.window_should_close(window):  # Dibujando --> 1. obtener el input
 
@@ -67,6 +68,7 @@ if __name__ == '__main__':
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
+
         tubes.create_tube(pipeline)
         tubes.updatePosition(dt)
         bird.updatePosition(gravity, dt)
