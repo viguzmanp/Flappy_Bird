@@ -4,6 +4,7 @@ __license__ = "MIT"
 
 ## Imports
 # Libraries imports
+from cmath import sin
 from msilib.schema import Class
 from OpenGL.GL import *
 import random
@@ -152,7 +153,7 @@ class TubeFactory(object):
 
    # Sets the scene when the player wins
    def win(self):
-      glClearColor(0, 0.4, 0, 1.0)  # Cambiamos a verde
+      glClearColor(0.1, 0.5, 0, 1.0)  # Cambiamos a verde
 
    # Factory that creates tubes in the scene
    def create_tube(self, pipeline):
